@@ -12,5 +12,12 @@
 <p>Deskripsi:</p>
 <p>{{ $product->description }}</p>
 
+<form action="{{ route('cart.store', $product->id) }}" method="POST">
+    @csrf
+    <button type="submit">
+        Tambah ke Keranjang
+    </button>
+</form>
+
 <a href="{{ route('products.index') }}">Kembali ke daftar produk</a>
 @endsection
