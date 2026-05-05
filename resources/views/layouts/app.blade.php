@@ -13,6 +13,7 @@
 
         <div style="float: right;">
             @auth
+             <a href="{{ route('profile.index') }}">Profile</a>
                 <span>{{ Auth::user()->name }}</span>
 
                 <form action="{{ route('logout') }}" method="POST" style="display:inline;">
