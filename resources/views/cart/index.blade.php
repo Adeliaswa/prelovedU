@@ -8,7 +8,6 @@
 
 @section('styles')
 <style>
-    /* ===== CART PAGE STYLES ===== */
     .cart-hero {
         padding: 48px 0 24px;
         border-bottom: 1px solid var(--border);
@@ -34,7 +33,6 @@
         .cart-layout { grid-template-columns: 1fr; }
     }
 
-    /* Cart Items */
     .cart-items {
         display: flex;
         flex-direction: column;
@@ -47,7 +45,6 @@
         align-items: center;
         padding: 24px 0;
         border-bottom: 1px solid var(--border);
-        transition: background 0.2s;
     }
     .cart-item:first-child { border-top: 1px solid var(--border); }
     .cart-item-img {
@@ -77,7 +74,6 @@
         color: var(--text-muted);
         font-size: 1.5rem;
     }
-    .cart-item-info { flex: 1; }
     .cart-item-name {
         font-size: 0.9375rem;
         font-weight: 600;
@@ -102,11 +98,9 @@
         gap: 12px;
     }
 
-    /* Qty Control */
     .qty-control {
         display: flex;
         align-items: center;
-        gap: 0;
         border: 1px solid var(--border);
         border-radius: 8px;
         overflow: hidden;
@@ -142,7 +136,6 @@
     }
     .qty-display:focus { outline: none; }
 
-    /* Delete button */
     .btn-delete {
         background: transparent;
         border: none;
@@ -158,14 +151,12 @@
     }
     .btn-delete:hover { color: #e53e3e; }
 
-    /* Stock warning */
     .stock-warning {
         font-size: 0.75rem;
         color: #e53e3e;
         margin-top: 4px;
     }
 
-    /* Summary Card */
     .cart-summary {
         position: sticky;
         top: 100px;
@@ -238,45 +229,11 @@
         margin-top: 12px;
     }
 
-    /* Empty cart */
-    .cart-empty {
-        padding: 80px 0;
-        text-align: center;
+    /* Fallback minimal kalau keranjang kosong */
+    .cart-empty-minimal {
+        padding: 60px 0;
         color: var(--text-muted);
-    }
-    .cart-empty .empty-icon {
-        font-size: 3rem;
-        margin-bottom: 16px;
-        opacity: 0.3;
-    }
-    .cart-empty h3 {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-    }
-    .cart-empty p {
         font-size: 0.875rem;
-        margin-bottom: 24px;
-    }
-    .btn-browse {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 12px 24px;
-        border: 1.5px solid var(--text-primary);
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        text-decoration: none;
-        transition: background 0.15s, color 0.15s;
-        font-family: 'Poppins', sans-serif;
-    }
-    .btn-browse:hover {
-        background: var(--text-primary);
-        color: var(--bg-main);
-        text-decoration: none;
     }
 </style>
 @endsection
@@ -285,10 +242,9 @@
 <div class="container">
     <div class="cart-hero">
         <h1>Keranjang Belanja</h1>
-        <p>{{ $cartItems->count() }} item{{ $cartItems->count() != 1 ? '' : '' }} di keranjang kamu</p>
+        <p>{{ $cartItems->count() }} item di keranjang kamu</p>
     </div>
 
-    {{-- Alert messages --}}
     @if(session('success'))
         <div class="alert-toast alert-success">{{ session('success') }}</div>
     @endif
@@ -296,108 +252,98 @@
         <div class="alert-toast alert-error">{{ session('error') }}</div>
     @endif
 
-    @if($cartItems->isEmpty())
-        <div class="cart-empty">
-            <div class="empty-icon">🛒</div>
-            <h3>Keranjang kamu masih kosong</h3>
-            <p>Temukan barang preloved yang kamu suka dan tambahkan ke sini.</p>
-            <a href="{{ route('products.index') }}" class="btn-browse">
-                Jelajahi Produk →
-            </a>
-        </div>
-    @else
-        <div class="cart-layout">
-            {{-- Cart Items --}}
-            <div class="cart-items">
-                @foreach($cartItems as $item)
-                <div class="cart-item" id="cart-item-{{ $item->id }}">
-                    {{-- Product Image --}}
-                    <div class="cart-item-img">
-                        @if($item->product->image)
-                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
-                        @else
-                            <div class="no-img">📦</div>
-                        @endif
+    <div class="cart-layout">
+        {{-- Cart Items --}}
+        <div class="cart-items">
+            @forelse($cartItems as $item)
+            <div class="cart-item" id="cart-item-{{ $item->id }}">
+                <div class="cart-item-img">
+                    @if($item->product->image)
+                        <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
+                    @else
+                        <div class="no-img">📦</div>
+                    @endif
+                </div>
+
+                <div class="cart-item-info">
+                    <div class="cart-item-name">{{ $item->product->name }}</div>
+                    <div class="cart-item-price">Rp {{ number_format($item->product->price, 0, ',', '.') }} / pcs</div>
+                    <div class="cart-item-subtotal">
+                        Subtotal: Rp {{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}
                     </div>
+                    @if($item->quantity > $item->product->stock)
+                        <div class="stock-warning">⚠ Stok tidak cukup (tersedia: {{ $item->product->stock }})</div>
+                    @endif
+                </div>
 
-                    {{-- Product Info --}}
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">{{ $item->product->name }}</div>
-                        <div class="cart-item-price">Rp {{ number_format($item->product->price, 0, ',', '.') }} / pcs</div>
-                        <div class="cart-item-subtotal">
-                            Subtotal: Rp {{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}
-                        </div>
-                        @if($item->quantity > $item->product->stock)
-                            <div class="stock-warning">⚠ Stok tidak cukup (tersedia: {{ $item->product->stock }})</div>
-                        @endif
-                    </div>
-
-                    {{-- Actions --}}
-                    <div class="cart-item-actions">
-                        {{-- Qty Control --}}
-                        <div class="qty-control">
-                            <form action="{{ route('cart.update', $item->id) }}" method="POST" style="display:contents">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="quantity" value="{{ max(1, $item->quantity - 1) }}">
-                                <button type="submit" class="qty-btn" {{ $item->quantity <= 1 ? 'disabled' : '' }}>−</button>
-                            </form>
-                            <span class="qty-display">{{ $item->quantity }}</span>
-                            <form action="{{ route('cart.update', $item->id) }}" method="POST" style="display:contents">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="quantity" value="{{ $item->quantity + 1 }}">
-                                <button type="submit" class="qty-btn" {{ $item->quantity >= $item->product->stock ? 'disabled' : '' }}>+</button>
-                            </form>
-                        </div>
-
-                        {{-- Delete --}}
-                        <form action="{{ route('cart.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus item ini dari keranjang?')">
+                <div class="cart-item-actions">
+                    <div class="qty-control">
+                        <form action="{{ route('cart.update', $item->id) }}" method="POST" style="display:contents">
                             @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete">
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                                Hapus
-                            </button>
+                            @method('PUT')
+                            <input type="hidden" name="quantity" value="{{ max(1, $item->quantity - 1) }}">
+                            <button type="submit" class="qty-btn" {{ $item->quantity <= 1 ? 'disabled' : '' }}>−</button>
+                        </form>
+                        <span class="qty-display">{{ $item->quantity }}</span>
+                        <form action="{{ route('cart.update', $item->id) }}" method="POST" style="display:contents">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="quantity" value="{{ $item->quantity + 1 }}">
+                            <button type="submit" class="qty-btn" {{ $item->quantity >= $item->product->stock ? 'disabled' : '' }}>+</button>
                         </form>
                     </div>
+
+                    <form action="{{ route('cart.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus item ini dari keranjang?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-delete">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Hapus
+                        </button>
+                    </form>
                 </div>
-                @endforeach
+            </div>
+            @empty
+            <div class="cart-empty-minimal">
+                Belum ada item di keranjang.
+            </div>
+            @endforelse
+        </div>
+
+        {{-- Summary --}}
+        @php
+            $hasStockIssue = $cartItems->contains(fn($i) => $i->quantity > $i->product->stock);
+            $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+        @endphp
+        <aside class="cart-summary">
+            <h2>Ringkasan Pesanan</h2>
+
+            @foreach($cartItems as $item)
+            <div class="summary-row">
+                <span>{{ \Illuminate\Support\Str::limit($item->product->name, 22) }} ×{{ $item->quantity }}</span>
+                <span>Rp {{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</span>
+            </div>
+            @endforeach
+
+            <div class="summary-divider"></div>
+            <div class="summary-total">
+                <span>Total</span>
+                <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
             </div>
 
-            {{-- Summary --}}
-            @php
-                $hasStockIssue = $cartItems->contains(fn($i) => $i->quantity > $i->product->stock);
-                $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
-            @endphp
-            <aside class="cart-summary">
-                <h2>Ringkasan Pesanan</h2>
-
-                @foreach($cartItems as $item)
-                <div class="summary-row">
-                    <span>{{ \Illuminate\Support\Str::limit($item->product->name, 22) }} ×{{ $item->quantity }}</span>
-                    <span>Rp {{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</span>
+            @if($hasStockIssue)
+                <div style="font-size:0.8rem;color:#e53e3e;margin-bottom:16px;padding:10px;background:#fff5f5;border-radius:8px;border:1px solid #fed7d7;">
+                    ⚠ Beberapa item melebihi stok. Harap sesuaikan jumlah sebelum checkout.
                 </div>
-                @endforeach
+                <button class="btn-checkout" disabled>Lanjut ke Checkout</button>
+            @elseif($cartItems->isEmpty())
+                <button class="btn-checkout" disabled>Lanjut ke Checkout</button>
+            @else
+                <a href="{{ route('checkout.index') }}" class="btn-checkout">Lanjut ke Checkout</a>
+            @endif
 
-                <div class="summary-divider"></div>
-                <div class="summary-total">
-                    <span>Total</span>
-                    <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
-                </div>
-
-                @if($hasStockIssue)
-                    <div style="font-size:0.8rem;color:#e53e3e;margin-bottom:16px;padding:10px;background:#fff5f5;border-radius:8px;border:1px solid #fed7d7;">
-                        ⚠ Beberapa item melebihi stok. Harap sesuaikan jumlah sebelum checkout.
-                    </div>
-                    <button class="btn-checkout" disabled>Lanjut ke Checkout</button>
-                @else
-                    <a href="{{ route('checkout.index') }}" class="btn-checkout">Lanjut ke Checkout</a>
-                @endif
-
-                <p class="checkout-note">Gratis ongkir untuk semua pesanan 🎉</p>
-            </aside>
-        </div>
-    @endif
+            <p class="checkout-note">Gratis ongkir untuk semua pesanan 🎉</p>
+        </aside>
+    </div>
 </div>
 @endsection

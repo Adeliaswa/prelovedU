@@ -8,7 +8,6 @@
 
 @section('styles')
 <style>
-    /* ===== CHECKOUT PAGE ===== */
     .checkout-hero {
         padding: 48px 0 24px;
         border-bottom: 1px solid var(--border);
@@ -25,7 +24,6 @@
         margin-top: 4px;
     }
 
-    /* Steps indicator */
     .checkout-steps {
         display: flex;
         align-items: center;
@@ -60,7 +58,6 @@
         .checkout-layout { grid-template-columns: 1fr; }
     }
 
-    /* Form Section */
     .checkout-form-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -75,9 +72,7 @@
         color: var(--text-muted);
         margin-bottom: 20px;
     }
-    .form-group {
-        margin-bottom: 20px;
-    }
+    .form-group { margin-bottom: 20px; }
     .form-label {
         display: block;
         font-size: 0.8125rem;
@@ -105,13 +100,8 @@
         border-color: var(--text-primary);
     }
     .form-input.is-invalid,
-    .form-textarea.is-invalid {
-        border-color: #e53e3e;
-    }
-    .form-textarea {
-        resize: vertical;
-        min-height: 88px;
-    }
+    .form-textarea.is-invalid { border-color: #e53e3e; }
+    .form-textarea { resize: vertical; min-height: 88px; }
     .form-error {
         font-size: 0.75rem;
         color: #e53e3e;
@@ -126,18 +116,17 @@
         margin-top: 5px;
     }
 
-    /* Empty cart warning */
-    .empty-cart-warning {
-        padding: 20px;
+    /* Error cart kosong — inline di form, bukan halaman terpisah */
+    .cart-empty-error {
+        padding: 14px 16px;
         background: #fff5f5;
         border: 1px solid #fed7d7;
-        border-radius: 10px;
+        border-radius: 8px;
         margin-bottom: 20px;
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
         color: #c53030;
     }
 
-    /* Order Summary Sidebar */
     .order-summary-card {
         position: sticky;
         top: 100px;
@@ -206,9 +195,13 @@
         transition: opacity 0.2s, transform 0.15s;
         letter-spacing: -0.01em;
     }
-    .btn-order:hover {
+    .btn-order:hover:not(:disabled) {
         opacity: 0.85;
         transform: translateY(-1px);
+    }
+    .btn-order:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
     }
     .btn-back {
         display: inline-flex;
@@ -254,16 +247,16 @@
     @endif
 
     <div class="checkout-layout">
-        {{-- Left: Form --}}
         <div>
             <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form">
                 @csrf
                 <div class="checkout-form-card">
                     <div class="form-section-title">Data Pengiriman</div>
 
+                    {{-- Error cart kosong — validasi inline, bukan halaman terpisah --}}
                     @if($cartItems->isEmpty())
-                        <div class="empty-cart-warning">
-                            ⚠ Keranjang kamu kosong. <a href="{{ route('products.index') }}" style="font-weight:600;color:inherit;">Tambahkan produk</a> sebelum checkout.
+                        <div class="cart-empty-error">
+                            ⚠ Keranjang kamu kosong. Tambahkan produk sebelum checkout.
                         </div>
                     @endif
 
@@ -335,7 +328,6 @@
             </form>
         </div>
 
-        {{-- Right: Order Summary --}}
         <aside class="order-summary-card">
             <h2>Ringkasan Pesanan</h2>
 
