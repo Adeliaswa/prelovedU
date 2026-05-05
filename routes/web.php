@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return redirect()->route('products.index');
@@ -30,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add/{productId}', [CartController::class, 'store'])->name('cart.store');
     Route::put('/cart/update/{cartId}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/delete/{cartId}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
