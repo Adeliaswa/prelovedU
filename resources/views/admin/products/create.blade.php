@@ -1,161 +1,87 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Produk')
-@section('page-title', 'Tambah Produk Baru')
-@section('page-subtitle', 'Tambahkan item baru ke katalog toko')
+@section('title', 'Tambah Produk Baru')
 
 @section('content')
-<div class="max-w-2xl">
+<div style="margin-bottom: 32px;">
+    <a href="{{ route('admin.products.index') }}" style="font-size: 0.875rem; color: var(--text-muted); text-decoration: none; margin-bottom: 8px; display: inline-block;">
+        ← Kembali ke Katalog
+    </a>
+    <h1 style="font-size: 1.75rem; font-family: var(--font-display); color: var(--text-primary);">
+        Tambah Barang Baru
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.875rem;">
+        Masukkan rincian data untuk produk baru yang akan didaftarkan ke sistem.
+    </p>
+</div>
 
-    {{-- Breadcrumb --}}
-    <div class="flex items-center gap-2 text-sm text-slate-400 mb-6">
-        <a href="{{ route('admin.products.index') }}" class="hover:text-emerald-600 transition-colors">Produk</a>
-        <span>/</span>
-        <span class="text-slate-600 font-medium">Tambah Baru</span>
-    </div>
-
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data"
-          class="space-y-5">
+<div class="card" style="max-width: 800px;">
+    <!-- Form Action secara absolut mengarah ke method store di Controller dengan metode POST -->
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-
-        {{-- Nama Produk --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
-            <h3 class="font-semibold text-slate-700 text-sm uppercase tracking-wide">Informasi Produk</h3>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-2">
-                    Nama Produk <span class="text-red-400">*</span>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            
+            <!-- Nama Produk -->
+            <div class="form-group" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px;">
+                <label class="form-label" for="name" style="font-weight: 500; font-size: 0.875rem;">
+                    Nama Produk <span style="color: var(--red);">*</span>
                 </label>
-                <input type="text" name="name" value="{{ old('name') }}" required
-                       placeholder="Contoh: Jaket Denim Levis Vintage"
-                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all @error('name') border-red-300 @enderror">
-                @error('name')
-                    <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                        {{ $message }}
-                    </p>
-                @enderror
+                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none;">
+                @error('name')<span style="color: var(--red); font-size: 0.75rem;">{{ $message }}</span>@enderror
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-2">
-                    Deskripsi <span class="text-red-400">*</span>
+            <!-- Harga -->
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <label class="form-label" for="price" style="font-weight: 500; font-size: 0.875rem;">
+                    Harga (Rp) <span style="color: var(--red);">*</span>
                 </label>
-                <textarea name="description" rows="4" required
-                          placeholder="Deskripsikan kondisi, ukuran, bahan, atau detail penting lainnya..."
-                          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all resize-none @error('description') border-red-300 @enderror">{{ old('description') }}</textarea>
-                @error('description')
-                    <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
-                @enderror
+                <div style="position: relative; display: flex; align-items: center;">
+                    <span style="position: absolute; left: 12px; font-size: 0.875rem; color: var(--text-muted); font-weight: 600;">Rp</span>
+                    <input type="number" id="price" name="price" class="form-input" value="{{ old('price') }}" required min="0" style="width: 100%; padding: 12px 12px 12px 36px; border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none;">
+                </div>
+                @error('price')<span style="color: var(--red); font-size: 0.75rem;">{{ $message }}</span>@enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Harga (Rp) <span class="text-red-400">*</span>
-                    </label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">Rp</span>
-                        <input type="number" name="price" value="{{ old('price') }}" required min="0"
-                               placeholder="0"
-                               class="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all @error('price') border-red-300 @enderror">
-                    </div>
-                    @error('price')
-                        <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
+            <!-- Stok -->
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <label class="form-label" for="stock" style="font-weight: 500; font-size: 0.875rem;">
+                    Stok Awal <span style="color: var(--red);">*</span>
+                </label>
+                <input type="number" id="stock" name="stock" class="form-input" value="{{ old('stock', 1) }}" required min="1" style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none;">
+                @error('stock')<span style="color: var(--red); font-size: 0.75rem;">{{ $message }}</span>@enderror
+            </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Stok <span class="text-red-400">*</span>
-                    </label>
-                    <input type="number" name="stock" value="{{ old('stock', 1) }}" required min="0"
-                           placeholder="0"
-                           class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all @error('stock') border-red-300 @enderror">
-                    @error('stock')
-                        <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
+            <!-- Deskripsi -->
+            <div class="form-group" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px;">
+                <label class="form-label" for="description" style="font-weight: 500; font-size: 0.875rem;">
+                    Deskripsi & Kondisi Barang <span style="color: var(--red);">*</span>
+                </label>
+                <textarea id="description" name="description" rows="5" class="form-input" required style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none; resize: vertical;">{{ old('description') }}</textarea>
+                @error('description')<span style="color: var(--red); font-size: 0.75rem;">{{ $message }}</span>@enderror
+            </div>
+
+            <!-- Foto Produk -->
+            <div class="form-group" style="grid-column: 1 / -1; padding: 20px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px dashed var(--text-muted);">
+                <label class="form-label" for="image" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 12px;">
+                    Unggah Foto Produk (Opsional)
+                </label>
+                
+                <input type="file" id="image" name="image" class="form-input" accept="image/*" style="width: 100%; padding: 8px; background: var(--bg-card); border-radius: 4px;">
+                <span style="display: block; margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">Format didukung: JPG, PNG, JPEG. Maksimal ukuran memori: 2MB.</span>
+                @error('image')<span style="display: block; margin-top: 4px; color: var(--red); font-size: 0.75rem;">{{ $message }}</span>@enderror
             </div>
         </div>
 
-        {{-- Upload Gambar --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6">
-            <h3 class="font-semibold text-slate-700 text-sm uppercase tracking-wide mb-4">Foto Produk</h3>
-
-            <div id="drop-zone"
-                 class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-all @error('image') border-red-300 @enderror"
-                 onclick="document.getElementById('image-input').click()">
-
-                {{-- Preview --}}
-                <div id="image-preview" class="hidden mb-4">
-                    <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-xl object-cover">
-                </div>
-
-                {{-- Placeholder --}}
-                <div id="upload-placeholder">
-                    <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <p class="text-sm font-medium text-slate-600">Klik untuk upload foto</p>
-                    <p class="text-xs text-slate-400 mt-1">PNG, JPG, JPEG — Maks. 2MB</p>
-                </div>
-
-                <input type="file" id="image-input" name="image" accept="image/*" class="hidden"
-                       onchange="previewImage(this)">
-            </div>
-            <div id="file-name" class="text-xs text-slate-400 mt-2 text-center hidden"></div>
-
-            @error('image')
-                <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Actions --}}
-        <div class="flex items-center gap-3">
-            <button type="submit"
-                    class="flex-1 sm:flex-none px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl text-sm transition-colors">
+        <!-- Tombol Aksi Eksekusi -->
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="reset" class="btn-outline">
+                Reset Form
+            </button>
+            <button type="submit" class="btn-solid">
                 Simpan Produk
             </button>
-            <a href="{{ route('admin.products.index') }}"
-               class="flex-1 sm:flex-none px-8 py-3 border border-slate-200 text-slate-600 font-medium rounded-xl text-sm text-center hover:bg-slate-50 transition-colors">
-                Batal
-            </a>
         </div>
     </form>
 </div>
-
-@push('scripts')
-<script>
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('preview-img').src = e.target.result;
-            document.getElementById('image-preview').classList.remove('hidden');
-            document.getElementById('upload-placeholder').classList.add('hidden');
-            document.getElementById('file-name').textContent = file.name;
-            document.getElementById('file-name').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// Drag and Drop
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-emerald-400', 'bg-emerald-50/30'); });
-dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-emerald-400', 'bg-emerald-50/30'); });
-dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('border-emerald-400', 'bg-emerald-50/30');
-    const input = document.getElementById('image-input');
-    input.files = e.dataTransfer.files;
-    previewImage(input);
-});
-</script>
-@endpush
 @endsection
