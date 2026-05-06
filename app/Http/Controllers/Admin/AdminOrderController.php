@@ -54,4 +54,17 @@ class AdminOrderController extends Controller
         return redirect()->route('admin.orders.show', $order->id)
                          ->with('success', 'Status pesanan #' . str_pad($order->id, 5, '0', STR_PAD_LEFT) . ' diperbarui menjadi "' . ($statusLabel[$request->status] ?? $request->status) . '".');
     }
+
+    
+    public function update(\Illuminate\Http\Request $request, \App\Models\Order $order)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,diproses,dikirim,selesai',
+        ]);
+
+        $order->status = $request->status;
+        $order->save();
+
+        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui menjadi: ' . strtoupper($request->status));
+    }
 }

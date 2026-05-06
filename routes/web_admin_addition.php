@@ -35,3 +35,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/admin', function () {
     return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'admin']);
+
+Route::put('/admin/orders/{order}', [\App\Http\Controllers\Admin\AdminOrderController::class, 'update'])
+    ->name('admin.orders.update')
+    ->middleware('admin'); 
