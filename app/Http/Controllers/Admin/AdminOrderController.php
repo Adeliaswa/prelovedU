@@ -8,35 +8,50 @@ use Illuminate\Http\Request;
 
 class AdminOrderController extends Controller
 {
-    public function index()
+    /**
+     * List semua pesanan dengan filter status
+     */
+    public function index(Request $request)
     {
-        $orders = Order::with('user')
-            ->latest()
-            ->get();
+        $query = Order::with('user')->latest();
+
+        if ($request->filled('status') && in_array($request->status, ['diproses', 'dikirim', 'selesai'])) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->paginate(15)->withQueryString();
 
         return view('admin.orders.index', compact('orders'));
     }
 
+    /**
+     * Detail pesanan
+     */
     public function show($id)
     {
-        $order = Order::with(['user', 'orderDetails.product'])
-            ->findOrFail($id);
+        $order = Order::with(['user', 'orderDetails.product'])->findOrFail($id);
 
         return view('admin.orders.show', compact('order'));
     }
 
+    /**
+     * Update status pesanan
+     */
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
             'status' => 'required|in:diproses,dikirim,selesai',
+        ], [
+            'status.required' => 'Status wajib dipilih.',
+            'status.in'       => 'Status tidak valid.',
         ]);
 
         $order = Order::findOrFail($id);
+        $order->update(['status' => $request->status]);
 
-        $order->update([
-            'status' => $request->status,
-        ]);
+        $statusLabel = ['diproses' => 'Diproses', 'dikirim' => 'Dikirim', 'selesai' => 'Selesai'];
 
-        return back()->with('success', 'Status pesanan berhasil diperbarui.');
+        return redirect()->route('admin.orders.show', $order->id)
+                         ->with('success', 'Status pesanan #' . str_pad($order->id, 5, '0', STR_PAD_LEFT) . ' diperbarui menjadi "' . ($statusLabel[$request->status] ?? $request->status) . '".');
     }
 }
