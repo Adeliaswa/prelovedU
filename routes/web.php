@@ -54,14 +54,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Redirect /admin ke /admin/dashboard
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
 
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/admin', function () {
-    return redirect()->route('admin.dashboard');
-})->middleware(['auth', 'admin']);
-
 
     // Manajemen Produk (CRUD)
     Route::resource('/products', AdminProductController::class);
@@ -69,6 +69,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Manajemen Pesanan
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
-    Route::put('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    
+    // PERBAIKAN: Menggunakan method update() dan name('orders.update') 
+    // agar cocok dengan view: route('admin.orders.update', $order->id)
+    Route::put('/orders/{id}', [AdminOrderController::class, 'update'])->name('orders.update');
 
 });

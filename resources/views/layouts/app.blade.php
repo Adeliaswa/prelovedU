@@ -579,22 +579,28 @@
             </nav>
 
             {{-- User Actions --}}
-            <div class="navbar-actions">
-                <a href="{{ route('profile.index') }}" class="nav-user {{ request()->routeIs('profile.*') ? '' : '' }}" style="text-decoration:none;">
-                    <div class="nav-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
-                    <span class="nav-user-name" style="font-size:0.8125rem;">{{ Illuminate\Support\Str::limit(Auth::user()->name, 14) }}</span>
-                </a>
+<div class="navbar-actions">
+    {{-- Logika: Jika admin, arahkan ke dashboard. Jika user biasa, arahkan ke profile --}}
+    <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('profile.index') }}" 
+       class="nav-user {{ request()->routeIs('profile.*') ? 'active' : '' }}" 
+       style="text-decoration:none;">
+        
+        <div class="nav-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+        <span class="nav-user-name" style="font-size:0.8125rem;">
+            {{ Illuminate\Support\Str::limit(Auth::user()->name, 14) }}
+        </span>
+    </a>
 
-                <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn-nav-logout">
-                        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                            <path d="M5 1.5H2.5A1 1 0 001.5 2.5v8a1 1 0 001 1H5M9 9.5l3-3-3-3M12 6.5H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="nav-hide-mobile">Keluar</span>
-                    </button>
-                </form>
-            </div>
+    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+        @csrf
+        <button type="submit" class="btn-nav-logout">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path d="M5 1.5H2.5A1 1 0 001.5 2.5v8a1 1 0 001 1H5M9 9.5l3-3-3-3M12 6.5H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="nav-hide-mobile">Keluar</span>
+        </button>
+    </form>
+</div>
             @else
             {{-- Guest --}}
             <div class="navbar-actions">
